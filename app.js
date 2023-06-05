@@ -5,7 +5,7 @@ const bodyparser = require("body-parser");
 const date = require(__dirname + "/date.js");
 const { MongoClient } = require("mongodb");
 const PORT = 3000;
-    
+
 const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({extended: true}));
