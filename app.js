@@ -10,9 +10,8 @@ app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(express.static("public"))
 
-const uri= process.env.uri;
 // Database and collection initialisation
-const client = new MongoClient(uri);
+const client = new MongoClient(process.env.uri);
 
 let page = "";
 
