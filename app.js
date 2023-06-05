@@ -12,7 +12,7 @@ app.use(bodyparser.urlencoded({extended: true}));
 app.use(express.static("public"))
 
 // Database and collection initialisation
-const client = new MongoClient(process.env.uri);
+const client = new MongoClient(`mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/`);
 
 let page = "";
 
