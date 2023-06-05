@@ -9,7 +9,7 @@ const PORT = 3000;
 const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({extended: true}));
-app.use(express.static("public"))
+app.use(express.static("public"));
 
 // Database and collection initialisation
 const uri = `mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/`;
@@ -30,7 +30,10 @@ app.get("/", function(req, res){
                 allItems.push(item);
             });
             res.render("list", {ListTitle: "Today", Tasks: allItems});
-        }finally{
+        }catch(err){
+            console.log(err);
+        }
+        finally{
             await client.close();
         }
     }
@@ -43,7 +46,7 @@ app.get("/:TypeOfList", function(req, res){
         page = "work";
         async function DisplayWork(){
             try{
-                const WorkItems = []
+                const WorkItems = [];
                 await client.connect();
                 const db = client.db("dbToDoList");
                 const coll = db.collection("WorkToDoList");
@@ -52,13 +55,16 @@ app.get("/:TypeOfList", function(req, res){
                     WorkItems.push(item);
                 });
                 res.render("list", {ListTitle: "Work", Tasks: WorkItems});
-            }finally{
+            }catch(err){
+                console.log(err);
+            }
+            finally{
                 await client.close();
             }
         }
         DisplayWork();
     }
-})
+});
 
 app.post("/:TypeOfList", function(req, res){
     if(page == "work"){
@@ -72,7 +78,10 @@ app.post("/:TypeOfList", function(req, res){
                 };
                 await coll.insertOne(Item);
                 res.redirect("/work");
-            }finally{
+            }catch(err){
+                console.log(err);
+            }
+            finally{
                 await client.close();
             }
         }
@@ -88,7 +97,10 @@ app.post("/:TypeOfList", function(req, res){
                 };
                 await coll.insertOne(Item);
                 res.redirect("/");
-            }finally{
+            }catch(err){
+                console.log(err);
+            }
+            finally{
                 await client.close();
             }
         }
