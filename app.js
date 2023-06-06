@@ -114,7 +114,28 @@ app.post("/TypeOfList", function(req, res){
 
 app.post("/remove", function(req,res){
     if(page == "work"){
-        console.log("remove in page work");
+        let Task = [];
+        req.body.checked.forEach(function(check){
+            Task.push(allItems[parseInt(check)]);
+        });
+
+        async function deleteWork(){
+            try{
+                await client.connect();
+                const db = client.db("dbToDoList");
+                const coll = db.collection("WorkToDoList");
+                for(let i = 0; i < Task.length; i++){
+                    await coll.deleteOne(Task[i]);
+                }
+            }catch(err){
+                if(err){
+                    console.log(err);
+                }
+            }finally{
+                await client.close();
+            }
+        }
+        deleteWork();
     }else{
         let Task = [];
         req.body.checked.forEach(function(check){
@@ -127,7 +148,7 @@ app.post("/remove", function(req,res){
                 const db = client.db("dbToDoList");
                 const coll = db.collection("ToDoList");
                 for(let i = 0; i < Task.length; i++){
-                    result = await coll.deleteOne(Task[i]);
+                    await coll.deleteOne(Task[i]);
                 }
             }catch(err){
                 if(err){
@@ -135,7 +156,6 @@ app.post("/remove", function(req,res){
                 }
             }finally{
                 await client.close();
-                res.redirect("/");
             }
         }
         deleteToday();
