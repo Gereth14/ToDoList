@@ -10,6 +10,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(express.static("public"));
+app.use(express.json());
 
 // Database and collection initialisation
 const uri = `mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/`;
@@ -17,11 +18,14 @@ const client = new MongoClient(uri);
 
 let page = "";
 
+let allItems = [];
+let WorkItems = [];
+
 app.get("/", function(req, res){
     let day = date.getDay();
     async function DisplayItem(){
         try{
-            const allItems = [];
+            allItems = [];
             await client.connect();
             const db = client.db("dbToDoList");
             const coll = db.collection("ToDoList");
@@ -46,7 +50,7 @@ app.get("/:TypeOfList", function(req, res){
         page = "work";
         async function DisplayWork(){
             try{
-                const WorkItems = [];
+                WorkItems = [];
                 await client.connect();
                 const db = client.db("dbToDoList");
                 const coll = db.collection("WorkToDoList");
@@ -66,7 +70,7 @@ app.get("/:TypeOfList", function(req, res){
     }
 });
 
-app.post("/:TypeOfList", function(req, res){
+app.post("/TypeOfList", function(req, res){
     if(page == "work"){
         async function InsertWork(){
             try{
@@ -109,7 +113,33 @@ app.post("/:TypeOfList", function(req, res){
 });
 
 app.post("/remove", function(req,res){
-    console.log("working");
+    if(page == "work"){
+        console.log("remove in page work");
+    }else{
+        let Task = [];
+        req.body.checked.forEach(function(check){
+            Task.push(allItems[parseInt(check)]);
+        });
+
+        async function deleteToday(){
+            try{
+                await client.connect();
+                const db = client.db("dbToDoList");
+                const coll = db.collection("ToDoList");
+                for(let i = 0; i < Task.length; i++){
+                    result = await coll.deleteOne(Task[i]);
+                }
+            }catch(err){
+                if(err){
+                    console.log(err);
+                }
+            }finally{
+                await client.close();
+                res.redirect("/");
+            }
+        }
+        deleteToday();
+    }
 });
 
 app.listen(process.env.PORT || PORT, function(){

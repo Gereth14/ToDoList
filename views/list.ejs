@@ -4,14 +4,36 @@
         </div>
 
         <div class="box">
+            <% let i = 0; %>
             <%Tasks.forEach(function(Task){ %>
                 <div class="item">
-                    <input type="checkbox">
+                    <input type="checkbox" value="<%= i %>">
                     <p><%=  Task.name %></p>
                 </div>
-           <% }); %>  
-           <form action="/:TypeOfList" method="post" class="item">
-                <input autocomplete="off" type="text" name="NewTask" placeholder="New Task">
+                <% i++; %>
+           <% }); %>
+            <button id="btnDelete" class="delete-button" onclick="myDelete()">-</button>
+            <script>
+                function myDelete(){
+                let arr = [];
+                let checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+                for (let i = 0; i < checkboxes.length; i++) {
+                    arr.push(checkboxes[i].value)
+                }
+                let body = JSON.stringify({checked : arr});
+                fetch("/remove",
+                {method: "post",
+                 body: body,
+                 headers: {
+                    'Content-Type' : 'application/json' 
+                 }});
+            }
+            </script>
+            
+            
+           <form action="/TypeOfList" method="post" class="item">
+                <input autocomplete="off" type="text" name="NewTask" placeholder="New Task" required
+                oninvalid="this.setCustomValidity('task is required')" oninput="this.setCustomValidity('')">
                 <button type="submit" name="btnList" class="round-button">+</button>
             </form>
             <% if(ListTitle == "Today"){ %>
@@ -24,5 +46,4 @@
             </form>
         </div>
         
-   
 <%- include("footer") -%>
