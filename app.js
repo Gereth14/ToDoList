@@ -1,165 +1,118 @@
 //jshint esversion:6
 require("dotenv").config();
 const express = require("express");
+const path = require("path");
 const bodyparser = require("body-parser");
-const date = require(__dirname + "/date.js");
 const { MongoClient } = require("mongodb");
 const PORT = 3000;
 
 const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({extended: true}));
-app.use(express.static("public"));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 // Database and collection initialisation
 const uri = `mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/`;
 const client = new MongoClient(uri);
+const db = client.db("dbToDoList");
 
 let page = "";
 
 let allItems = [];
-let WorkItems = [];
+let Collections = [];
 
 app.get("/", function(req, res){
-    let day = date.getDay();
-    async function DisplayItem(){
+    async function DisplayCollections(){
         try{
-            allItems = [];
             await client.connect();
-            const db = client.db("dbToDoList");
-            const coll = db.collection("ToDoList");
+            Collections = await db.listCollections().toArray();
+            res.render("home", {Lists: Collections});
+        }finally{
+            await client.close();
+        }
+    }
+    DisplayCollections();
+})
+
+app.get("/typeoflist/:list", function(req,res){
+    async function LoadList(ListName){
+        try{
+            await client.connect();
+            const coll = db.collection(ListName);
+            const cursor = coll.find();
+            allItems = [];
+            await cursor.forEach(function(item){
+                allItems.push(item);
+            });
+            res.render("list", {Tasks: allItems, ListTitle: ListName, Lists: Collections});
+        }finally{
+            await client.close();
+        }
+    }
+    page = req.params.list;
+    LoadList(page);
+    
+});
+
+app.post("/typeoflist/:list", function(req, res){
+    async function InsertItem(collection){
+        try{
+            await client.connect();
+            const coll = db.collection(collection);
+            const Item = {
+                name : req.body.NewTask
+            };
+            await coll.insertOne(Item);
+            res.redirect("/typeoflist/" + collection);
+        }finally{
+            await client.close();
+        }
+    }
+    InsertItem(req.params.list);
+});
+
+app.post("/remove", function(req, res){
+    let Task = [];
+    req.body.checked.forEach(function(check){
+        Task.push(allItems[parseInt(check)]);
+    });
+    async function DeleteTask(collection){
+        try{
+            await client.connect();
+            const coll = db.collection(collection);
+            for(let i = 0; i < Task.length; i++){
+                await coll.deleteOne(Task[i]);
+            }
             const cursor = coll.find();
             await cursor.forEach(function(item){
                 allItems.push(item);
             });
-            res.render("list", {ListTitle: "Today", Tasks: allItems});
-        }catch(err){
-            console.log(err);
-        }
-        finally{
+        }finally{
             await client.close();
         }
+        //res.render("list", {ListTitle: collection, Lists: Collections, Tasks: allItems});
+        res.redirect("/typeoflist/" + collection);
+        // TODO: refresh page once task(s) is deleted
     }
-    DisplayItem();
-    
+    DeleteTask(page)
 });
 
-app.get("/:TypeOfList", function(req, res){
-    if(req.params.TypeOfList.toLowerCase() == "work"){
-        page = "work";
-        async function DisplayWork(){
-            try{
-                WorkItems = [];
-                await client.connect();
-                const db = client.db("dbToDoList");
-                const coll = db.collection("WorkToDoList");
-                const cursor = coll.find();
-                await cursor.forEach(function(item){
-                    WorkItems.push(item);
-                });
-                res.render("list", {ListTitle: "Work", Tasks: WorkItems});
-            }catch(err){
-                console.log(err);
-            }
-            finally{
-                await client.close();
-            }
+app.post("/addList", function(req, res){
+    async function addList(collection){
+        try{
+            await client.connect();
+            await db.createCollection(collection, function(err, response){
+                if(err) throw err;
+                console.log("collection created!");
+            });
+            res.redirect("/");
+        }finally{
+            await client.close();
         }
-        DisplayWork();
+        
     }
-});
-
-app.post("/TypeOfList", function(req, res){
-    if(page == "work"){
-        async function InsertWork(){
-            try{
-                await client.connect();
-                const db = client.db("dbToDoList");
-                const coll = db.collection("WorkToDoList");
-                const Item = {
-                    name: req.body.NewTask
-                };
-                await coll.insertOne(Item);
-                res.redirect("/work");
-            }catch(err){
-                console.log(err);
-            }
-            finally{
-                await client.close();
-            }
-        }
-        InsertWork();
-    }else{
-        async function InsertDaily(){
-            try{
-                await client.connect();
-                const db = client.db("dbToDoList");
-                const coll = db.collection("ToDoList");
-                const Item = {
-                    name: req.body.NewTask
-                };
-                await coll.insertOne(Item);
-                res.redirect("/");
-            }catch(err){
-                console.log(err);
-            }
-            finally{
-                await client.close();
-            }
-        }
-        InsertDaily();
-    }
-});
-
-app.post("/remove", function(req,res){
-    if(page == "work"){
-        let Task = [];
-        req.body.checked.forEach(function(check){
-            Task.push(allItems[parseInt(check)]);
-        });
-
-        async function deleteWork(){
-            try{
-                await client.connect();
-                const db = client.db("dbToDoList");
-                const coll = db.collection("WorkToDoList");
-                for(let i = 0; i < Task.length; i++){
-                    await coll.deleteOne(Task[i]);
-                }
-            }catch(err){
-                if(err){
-                    console.log(err);
-                }
-            }finally{
-                await client.close();
-            }
-        }
-        deleteWork();
-    }else{
-        let Task = [];
-        req.body.checked.forEach(function(check){
-            Task.push(allItems[parseInt(check)]);
-        });
-
-        async function deleteToday(){
-            try{
-                await client.connect();
-                const db = client.db("dbToDoList");
-                const coll = db.collection("ToDoList");
-                for(let i = 0; i < Task.length; i++){
-                    await coll.deleteOne(Task[i]);
-                }
-            }catch(err){
-                if(err){
-                    console.log(err);
-                }
-            }finally{
-                await client.close();
-            }
-        }
-        deleteToday();
-    }
+    addList(req.body.NewList);
 });
 
 app.listen(process.env.PORT || PORT, function(){

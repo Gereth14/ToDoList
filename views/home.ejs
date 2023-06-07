@@ -1,0 +1,10 @@
+<%- include("header") -%> 
+        <div calss="box">
+            <%Lists.forEach(function(list){ %>
+                <form action="/typeoflist/<%= list.name %>" method="get" class="delete-form">
+                    <button class="rounded-button"><%= list.name %></button>
+                </form>
+            <% }); %>
+        </div>
+        <br>
+<%- include("footer") -%>

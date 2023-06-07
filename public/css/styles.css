@@ -58,6 +58,7 @@ form {
 }
 
 .delete-form{
+  align-items: center;
   float: left;
 }
 

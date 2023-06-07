@@ -1,6 +1,6 @@
-<%- include("header") -%> 
+<%- include("header") -%>
         <div class="box" id="heading">
-            <h1><%= ListTitle %> !</h1>
+            <h1 name="<%= ListTitle %>"><%= ListTitle %> !</h1>
         </div>
 
         <div class="box">
@@ -15,34 +15,36 @@
             <button id="btnDelete" class="delete-button" onclick="myDelete()">-</button>
             <script>
                 function myDelete(){
-                let arr = [];
-                let checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
-                for (let i = 0; i < checkboxes.length; i++) {
-                    arr.push(checkboxes[i].value)
+                    let arr = [];
+                    let checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+                    for (let i = 0; i < checkboxes.length; i++) {
+                        arr.push(checkboxes[i].value)
+                    }
+                    let body = JSON.stringify({checked : arr});
+                    fetch("/remove",
+                    {method: "post",
+                    body: body,
+                    headers: {
+                        'Content-Type' : 'application/json' 
+                    }});
                 }
-                let body = JSON.stringify({checked : arr});
-                fetch("/remove",
-                {method: "post",
-                 body: body,
-                 headers: {
-                    'Content-Type' : 'application/json' 
-                 }});
-            }
             </script>
             
             
-           <form action="/TypeOfList" method="post" class="item">
+           <form action="/TypeOfList/<%= ListTitle %>" method="post" class="item">
                 <input autocomplete="off" type="text" name="NewTask" placeholder="New Task" required
                 oninvalid="this.setCustomValidity('task is required')" oninput="this.setCustomValidity('')">
                 <button type="submit" name="btnList" class="round-button">+</button>
             </form>
-            <% if(ListTitle == "Today"){ %>
-               <% OtherPage = "work"; %>
-            <% }else{ %>
-                <% OtherPage = ""; %>
-            <% } %>
-            <form action="/<%= OtherPage %>" method="get">
-                <button class="rounded-button">The Other List</button>
+            <%Lists.forEach(function(list){ %>
+                <form action="/typeoflist/<%= list.name %>" method="get" class="delete-form">
+                    <button class="rounded-button"><%= list.name %></button>
+                </form>
+            <% }); %>
+            <form action="/addList" method="post" class="delete-form">
+                <input type="text" name="NewList" placeholder="New List" required
+                oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
+                <button type="submit" name="btnNewList" class="round-button">+</button>
             </form>
         </div>
         
