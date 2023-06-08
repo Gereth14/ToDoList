@@ -110,6 +110,21 @@ app.post("/addList", function(req, res){
     addList(req.body.NewList);
 });
 
+app.post("/dropCollection", function(req, res){
+    async function DropCollection(collection){
+        try{
+            await client.connect();
+            await db.dropCollection(collection, function(err){
+                if(err) throw err;
+            });
+            res.redirect("/");
+        }finally{
+            await client.close();
+        }
+    }
+    DropCollection(page);
+})
+
 app.listen(process.env.PORT || PORT, function(){
     console.log(`SERVER: http://LocalHost:${PORT}`);
 });

@@ -3,6 +3,9 @@
             <h1 id="ListTitle"><%= ListTitle %></h1>
         </div>
 
+        <form method="post" action="/dropCollection">
+            <button type="submit" class="rounded-button">Delete this list</button>
+        </form>
         <div class="box">
             <% let i = 0; %>
             <%Tasks.forEach(function(Task){ %>
