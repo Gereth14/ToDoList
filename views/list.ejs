@@ -3,9 +3,11 @@
             <h1 id="ListTitle"><%= ListTitle %></h1>
         </div>
 
-        <form method="post" action="/dropCollection">
-            <button type="submit" class="rounded-button">Delete this list</button>
-        </form>
+        <div class="delete-box">
+            <form method="post" action="/dropCollection" class="center-align-form">
+                <button type="submit" class="rounded-button">Delete this list</button>
+            </form>
+        </div>
         <div class="box">
             <% let i = 0; %>
             <%Tasks.forEach(function(Task){ %>
@@ -15,7 +17,10 @@
                 </div>
                 <% i++; %>
            <% }); %>
-           <button id="btnDelete" class="delete-button" onclick="myDelete()">-</button>
+           <form class="left-align-form">
+            <button id="btnDelete" class="delete-button" onclick="myDelete()">-</button>
+           </form>
+           
            <script>
                function myDelete(){
                    const pageTitle = document.getElementById("ListTitle").innerHTML;
@@ -49,11 +54,11 @@
                 <button type="submit" name="btnList" class="round-button">+</button>
             </form>
             <%Lists.forEach(function(list){ %>
-                <form action="/typeoflist/<%= list.name %>" method="get" class="delete-form">
+                <form action="/typeoflist/<%= list.name %>" method="get" class="left-align-form">
                     <button class="rounded-button"><%= list.name %></button>
                 </form>
             <% }); %>
-            <form action="/addList" method="post" class="delete-form">
+            <form action="/addList" method="post" class="left-align-form">
                 <input type="text" name="NewList" placeholder="New List" required
                 oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
                 <button type="submit" name="btnNewList" class="round-button">+</button>

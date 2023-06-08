@@ -1,7 +1,7 @@
 <%- include("header") -%> 
         <div calss="box">
             <%Lists.forEach(function(list){ %>
-                <form action="/typeoflist/<%= list.name %>" method="get" class="delete-form">
+                <form action="/typeoflist/<%= list.name %>" method="get" class="left-align-form">
                     <button class="rounded-button"><%= list.name %></button>
                 </form>
             <% }); %>

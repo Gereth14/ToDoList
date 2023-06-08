@@ -1,6 +1,6 @@
 html {
   background-color: #E4E9FD;
-  background-image: -webkit-linear-gradient(65deg, #A683E3 50%, #E4E9FD 50%);
+  background-image: linear-gradient(to bottom right, #A683E3, #E4E9FD);
   min-height: 1000px;
   font-family: 'helvetica neue';
 }
@@ -16,6 +16,13 @@ h1 {
   background: white;
   border-radius: 5px;
   box-shadow: 5px 5px 15px -5px rgba(0, 0, 0, 0.3);
+}
+.delete-box{
+  max-width: 150px;
+  box-shadow: none;
+  margin:5px auto;
+  max-height: 20px;
+
 }
 
 #heading {
@@ -57,9 +64,18 @@ form {
   margin-left: 20px;
 }
 
-.delete-form{
+.left-align-form{
+  min-height: 70px;
+  display: flex;
   align-items: center;
   float: left;
+}
+
+.center-align-form{
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  float: center
 }
 
 .round-button {
@@ -103,7 +119,7 @@ footer {
 
 .rounded-button{
   background-color: #A683E3;
-  float: right;
+  float: center;
   border-radius: 25px;
   width: 150px;
   height: 50px;
@@ -119,5 +135,5 @@ footer {
   font-size: 30px;
   padding-bottom: 6px;
   border-width: 0;
-  float: left;
+  align-self: left;
 }
