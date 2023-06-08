@@ -122,7 +122,25 @@ app.post("/dropCollection", function(req, res){
         }
     }
     DropCollection(page);
-})
+});
+
+app.get("/renameCollection", function(req, res){
+    res.render("rename", {ListTitle: page});
+});
+
+app.post("/renameCollection", function(req, res){
+    async function renameCollection(collection, rename){
+        try{
+            await client.connect();
+            const coll = db.collection(collection);
+            await coll.rename(rename);
+            res.redirect("/");
+        }finally{
+            await client.close();
+        }
+    }
+    renameCollection(page, req.body.Name);
+});
 
 app.listen(process.env.PORT || PORT, function(){
     console.log(`SERVER: http://LocalHost:${PORT}`);

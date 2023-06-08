@@ -1,13 +1,21 @@
 <%- include("header") -%>
+        <nav>
+            <input type="checkbox">
+            <span></span>
+            <span></span>
+            
+            <ul class="menu_list">
+                <form id="deleteList" method="post" action="/dropCollection"></form>
+                <li><a onclick="document.getElementById('deleteList').submit();">Delete List</a></li>
+                <form id="renameList" method="get" action="/renameCollection"></form>
+                <li><a onclick="document.getElementById('renameList').submit()">Rename List</a></li>
+            </ul>
+        </nav>
+
         <div class="box" id="heading">
             <h1 id="ListTitle"><%= ListTitle %></h1>
         </div>
 
-        <div class="delete-box">
-            <form method="post" action="/dropCollection" class="center-align-form">
-                <button type="submit" class="rounded-button">Delete this list</button>
-            </form>
-        </div>
         <div class="box">
             <% let i = 0; %>
             <%Tasks.forEach(function(Task){ %>
@@ -63,7 +71,7 @@
                 </form>
             <% }); %>
             <form action="/addList" method="post" class="left-align-form">
-                <input type="text" name="NewList" placeholder="New List" required
+                <input type="text" autocomplete="off" name="NewList" placeholder="New List" required
                 oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
                 <button type="submit" name="btnNewList" class="round-button">+</button>
             </form>
