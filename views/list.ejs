@@ -1,35 +1,44 @@
 <%- include("header") -%>
         <div class="box" id="heading">
-            <h1 name="<%= ListTitle %>"><%= ListTitle %> !</h1>
+            <h1 id="ListTitle"><%= ListTitle %></h1>
         </div>
 
         <div class="box">
             <% let i = 0; %>
             <%Tasks.forEach(function(Task){ %>
                 <div class="item">
-                    <input type="checkbox" value="<%= i %>">
+                    <input type="checkbox" value="<%= i %>" name="check">
                     <p><%=  Task.name %></p>
                 </div>
                 <% i++; %>
            <% }); %>
-            <button id="btnDelete" class="delete-button" onclick="myDelete()">-</button>
-            <script>
-                function myDelete(){
-                    let arr = [];
-                    let checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
-                    for (let i = 0; i < checkboxes.length; i++) {
-                        arr.push(checkboxes[i].value)
+           <button id="btnDelete" class="delete-button" onclick="myDelete()">-</button>
+           <script>
+               function myDelete(){
+                   const pageTitle = document.getElementById("ListTitle").innerHTML;
+                   let arr = [];
+                   let checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+                   for (let i = 0; i < checkboxes.length; i++) {
+                       arr.push(checkboxes[i].value)
+                   }
+                   let body = JSON.stringify({checked : arr});
+                   fetch("/remove",
+                   {method: "post",
+                   redirect:"follow",
+                   body: body,
+                   headers: {
+                       'Content-Type' : 'application/json' 
+                   }})
+                   .then(response => {
+                    if(response.redirected){
+                        window.location.href = "/typeoflist/" + pageTitle;
                     }
-                    let body = JSON.stringify({checked : arr});
-                    fetch("/remove",
-                    {method: "post",
-                    body: body,
-                    headers: {
-                        'Content-Type' : 'application/json' 
-                    }});
-                }
-            </script>
-            
+                   })
+                   .catch(function(err){
+                    console.info(err);
+                   })
+               }
+           </script>
             
            <form action="/TypeOfList/<%= ListTitle %>" method="post" class="item">
                 <input autocomplete="off" type="text" name="NewTask" placeholder="New Task" required

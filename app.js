@@ -77,23 +77,18 @@ app.post("/remove", function(req, res){
     req.body.checked.forEach(function(check){
         Task.push(allItems[parseInt(check)]);
     });
+    console.log(Task);
     async function DeleteTask(collection){
         try{
             await client.connect();
             const coll = db.collection(collection);
             for(let i = 0; i < Task.length; i++){
-                await coll.deleteOne(Task[i]);
+                let result = await coll.deleteOne(Task[i]);
             }
-            const cursor = coll.find();
-            await cursor.forEach(function(item){
-                allItems.push(item);
-            });
+            res.redirect("/typeoflist/" + page);
         }finally{
             await client.close();
         }
-        //res.render("list", {ListTitle: collection, Lists: Collections, Tasks: allItems});
-        res.redirect("/typeoflist/" + collection);
-        // TODO: refresh page once task(s) is deleted
     }
     DeleteTask(page)
 });
