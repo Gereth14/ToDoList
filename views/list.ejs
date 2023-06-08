@@ -26,6 +26,10 @@
                    const pageTitle = document.getElementById("ListTitle").innerHTML;
                    let arr = [];
                    let checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+                   if(checkboxes.length == 0){
+                    alert("Pls check at least one checkbox to delete");
+                    return;
+                   }
                    for (let i = 0; i < checkboxes.length; i++) {
                        arr.push(checkboxes[i].value)
                    }

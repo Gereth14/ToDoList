@@ -77,7 +77,6 @@ app.post("/remove", function(req, res){
     req.body.checked.forEach(function(check){
         Task.push(allItems[parseInt(check)]);
     });
-    console.log(Task);
     async function DeleteTask(collection){
         try{
             await client.connect();
