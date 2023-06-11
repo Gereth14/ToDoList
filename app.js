@@ -16,131 +16,129 @@ app.use(express.static(path.join(__dirname, "public")));
 const uri = `mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/`;
 const client = new MongoClient(uri);
 const db = client.db("dbToDoList");
+const coll = db.collection("Lists");
 
 let page = "";
 
+let Lists = [];
 let allItems = [];
 let Collections = [];
 
 app.get("/", function(req, res){
-    async function DisplayCollections(){
+    async function DisplayLists(){
         try{
             await client.connect();
-            Collections = await db.listCollections().toArray();
-            res.render("home", {Lists: Collections});
+            const cursor = coll.find();
+            Lists = [];
+            await cursor.forEach(function(list){
+                Lists.push(list);
+            });
+            
         }finally{
-            await client.close();
+            res.render("home", {Lists : Lists});
         }
     }
-    DisplayCollections();
-})
+    DisplayLists();
+});
 
-app.get("/typeoflist/:list", function(req,res){
-    async function LoadList(ListName){
+app.get("/Lists/:list", function(req,res){
+    async function LoadList(){
         try{
-            await client.connect();
-            const coll = db.collection(ListName);
-            const cursor = coll.find();
-            allItems = [];
-            await cursor.forEach(function(item){
-                allItems.push(item);
+            let query = {name : req.params.list};
+            const cursor = await coll.find(query).toArray();
+            Tasks = [];
+            await cursor.forEach(function(task){
+                for(let i = 0; i < task.Tasks.length; i++){
+                    Tasks.push(task.Tasks[i]);
+                }
             });
-            res.render("list", {Tasks: allItems, ListTitle: ListName, Lists: Collections});
+            
         }finally{
-            await client.close();
+            res.render("list", {ListTitle: req.params.list, Tasks : Tasks, Lists : Lists});
         }
     }
     page = req.params.list;
-    LoadList(page);
-    
+    LoadList();
 });
 
-app.post("/typeoflist/:list", function(req, res){
-    async function InsertItem(collection){
+
+app.post("/Lists/:list", function(req, res){
+    async function InsertItem(list){
         try{
-            await client.connect();
-            const coll = db.collection(collection);
-            const Item = {
-                name : req.body.NewTask
-            };
-            await coll.insertOne(Item);
-            res.redirect("/typeoflist/" + collection);
+            await coll.updateOne({name: page}, {$push: {Tasks: req.body.NewTask}})
         }finally{
-            await client.close();
+            res.redirect("/Lists/" + page);
         }
     }
     InsertItem(req.params.list);
 });
 
 app.post("/remove", function(req, res){
-    let Task = [];
-    req.body.checked.forEach(function(check){
-        Task.push(allItems[parseInt(check)]);
+    let task = [];
+    req.body.task.forEach(function(tasks){
+        task.push(tasks);
     });
-    async function DeleteTask(collection){
+    async function DeleteTask(){
         try{
-            await client.connect();
-            const coll = db.collection(collection);
-            for(let i = 0; i < Task.length; i++){
-                let result = await coll.deleteOne(Task[i]);
+            for(let i = 0; i < task.length; i++){
+                await coll.updateOne({name: page}, {$pull: {Tasks: task[i]}});
             }
-            res.redirect("/typeoflist/" + page);
         }finally{
-            await client.close();
+            res.redirect("/Lists/" + page);
         }
     }
-    DeleteTask(page)
+    DeleteTask();
+});
+
+app.post("/DeleteItem", function(req, res){
+    async function DeleteItem(){
+        try{
+            await coll.updateOne({name: page}, {$pull: {Tasks: req.body.task}});
+        }finally{
+            res.redirect("Lists/" + page);
+        }
+    }
+    DeleteItem();
 });
 
 app.post("/addList", function(req, res){
-    async function addList(collection){
+    async function AddList(){
         try{
-            await client.connect();
-            await db.createCollection(collection, function(err, response){
-                if(err) throw err;
-                console.log("collection created!");
-            });
-            res.redirect("/");
+            let list = [];
+            await coll.insertOne({name: req.body.NewList, Tasks: list});
         }finally{
-            await client.close();
-        }
-        
-    }
-    addList(req.body.NewList);
-});
-
-app.post("/dropCollection", function(req, res){
-    async function DropCollection(collection){
-        try{
-            await client.connect();
-            await db.dropCollection(collection, function(err){
-                if(err) throw err;
-            });
             res.redirect("/");
-        }finally{
-            await client.close();
         }
     }
-    DropCollection(page);
+    AddList();
 });
 
-app.get("/renameCollection", function(req, res){
+app.get("/renameList", function(req, res){
     res.render("rename", {ListTitle: page});
-});
+})
 
-app.post("/renameCollection", function(req, res){
-    async function renameCollection(collection, rename){
+app.post("/renameList", function(req, res){
+    // TODO: rename colection
+    async function renameList(){
         try{
-            await client.connect();
-            const coll = db.collection(collection);
-            await coll.rename(rename);
-            res.redirect("/");
+            await coll.updateOne({name: page}, {$set: {name: req.body.Name}});
         }finally{
-            await client.close();
+            res.redirect("/");
         }
     }
-    renameCollection(page, req.body.Name);
+    renameList();
 });
+
+app.post("/DeleteList", function(req, res){
+    async function DeleteList(){
+        try{
+            await coll.deleteOne({name: page});
+        }finally{
+            res.redirect("/");
+        }
+    }
+    DeleteList();
+})
 
 app.listen(process.env.PORT || PORT, function(){
     console.log(`SERVER: http://LocalHost:${PORT}`);

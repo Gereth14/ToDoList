@@ -1,13 +1,13 @@
-<%- include("header") -%>
+<%- include("partials/header") -%>
     <div class="box" id="heading">
         <h1><%= ListTitle %></h1>
     </div>
     
     <div class="rename-box">
-        <form method="post" action="/renameCollection" class="center-align-form">
+        <form method="post" action="/renameList" class="center-align-form">
             <input class="rename-input" autocomplete="off" name="Name" placeholder="New List Name" required oninvalid="this.setCustomValidity('List Name Required')" oninput="this.setCustomValidity('')">
             <button type="submit" class="rounded-button">Change Name</button>
         </form>
     </div>   
 
-<%- include("footer") -%>
+<%- include("partials/footer") -%>

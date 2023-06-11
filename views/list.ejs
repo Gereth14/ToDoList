@@ -1,14 +1,14 @@
-<%- include("header") -%>
+<%- include("partials/header") -%>
         <nav>
             <input type="checkbox">
             <span></span>
             <span></span>
             
             <ul class="menu_list">
-                <form id="deleteList" method="post" action="/dropCollection"></form>
-                <li><a onclick="document.getElementById('deleteList').submit();">Delete List</a></li>
-                <form id="renameList" method="get" action="/renameCollection"></form>
+                <form id="renameList" method="get" action="/renameList"></form>
                 <li><a onclick="document.getElementById('renameList').submit()">Rename List</a></li>
+                <form id="deleteList" method="post" action="/DeleteList"></form>
+                <li><a onclick="document.getElementById('deleteList').submit();">Delete List</a></li>
             </ul>
         </nav>
 
@@ -20,56 +20,30 @@
             <% let i = 0; %>
             <%Tasks.forEach(function(Task){ %>
                 <div class="item">
-                    <input type="checkbox" value="<%= i %>" name="check">
-                    <p><%=  Task.name %></p>
+                    <input type="checkbox" value="<%= Task %>" name="check">
+                    <p id="TaskName"><%=  Task %></p>
+                        <button value="<%= Task %>" id="btnIDelete" onclick="iDelete(this)" class="btn btn-delete">
+                            <span class="mdi mdi-delete mdi-24px"></span>
+                            <span class="mdi mdi-delete-empty mdi-24px"></span>
+                            <span>Delete</span>
+                          </button>
                 </div>
-                <% i++; %>
+                <% i += 1; %>
            <% }); %>
            <form class="left-align-form">
             <button id="btnDelete" class="delete-button" onclick="myDelete()">-</button>
            </form>
-           
-           <script>
-               function myDelete(){
-                   const pageTitle = document.getElementById("ListTitle").innerHTML;
-                   let arr = [];
-                   let checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
-                   if(checkboxes.length == 0){
-                    alert("Pls check at least one checkbox to delete");
-                    return;
-                   }
-                   for (let i = 0; i < checkboxes.length; i++) {
-                       arr.push(checkboxes[i].value)
-                   }
-                   let body = JSON.stringify({checked : arr});
-                   fetch("/remove",
-                   {method: "post",
-                   redirect:"follow",
-                   body: body,
-                   headers: {
-                       'Content-Type' : 'application/json' 
-                   }})
-                   .then(response => {
-                    if(response.redirected){
-                        window.location.href = "/typeoflist/" + pageTitle;
-                    }
-                   })
-                   .catch(function(err){
-                    console.info(err);
-                   })
-               }
-           </script>
             
-           <form action="/TypeOfList/<%= ListTitle %>" method="post" class="item">
+           <form action="/Lists/<%= ListTitle %>" method="post" class="item">
                 <input autocomplete="off" type="text" name="NewTask" placeholder="New Task" required
                 oninvalid="this.setCustomValidity('task is required')" oninput="this.setCustomValidity('')">
                 <button type="submit" name="btnList" class="round-button">+</button>
             </form>
             <%Lists.forEach(function(list){ %>
-                <form action="/typeoflist/<%= list.name %>" method="get" class="left-align-form">
+                <form action="/Lists/<%= list.name %>" method="get" class="left-align-form">
                     <button class="rounded-button"><%= list.name %></button>
                 </form>
-            <% }); %>
+            <% }) %>
             <form action="/addList" method="post" class="left-align-form">
                 <input type="text" autocomplete="off" name="NewList" placeholder="New List" required
                 oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
@@ -77,4 +51,4 @@
             </form>
         </div>
         
-<%- include("footer") -%>
+<%- include("partials/footer") -%>

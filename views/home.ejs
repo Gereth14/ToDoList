@@ -1,10 +1,9 @@
-<%- include("header") -%> 
-        <div calss="box">
-            <%Lists.forEach(function(list){ %>
-                <form action="/typeoflist/<%= list.name %>" method="get" class="left-align-form">
-                    <button class="rounded-button"><%= list.name %></button>
-                </form>
-            <% }); %>
-        </div>
-        <br>
-<%- include("footer") -%>
+<%- include("partials/header") -%>
+    <div class="box">
+        <%Lists.forEach(function(list){ %>
+            <form action="/Lists/<%= list.name %>" method="get" class="left-align-form">
+                <button class="rounded-button"><%= list.name %></button>
+            </form>
+        <% }) %>
+    </div>
+<%- include("partials/footer") -%>
