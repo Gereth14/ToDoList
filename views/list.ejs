@@ -82,6 +82,25 @@
             <div class="col"><div class="p-3"></div></div>
         </div>
     </div>
+    
+    <form action="/addList" method="post" class="mx-auto col-10 col-md-8 col-lg-6">
+        <div class="container text-center">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="form-floating">
+                        <input class="form-control" id="NewList" type="text" autocomplete="off" name="NewList" placeholder="New List" required
+                        oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
+                        <label for="NewList">New List</label>
+                    </div>
+                    <div class="input-group-append">
+                        <button type="submit" name="btnNewList" class="rounded-pill" style="background-color: #A683E3;">+</button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>  
+    </form>
+
     <div class="dropdown container text-center">
         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           Lists
@@ -92,11 +111,5 @@
             <% }) %>
         </ul>
     </div>
-    
-    <form action="/addList" method="post" class="container text-center">
-        <input type="text" autocomplete="off" name="NewList" placeholder="New List" required
-        oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
-        <button type="submit" name="btnNewList" class="rounded-pill" style="background-color: #A683E3;">+</button>
-    </form>
         
 <%- include("partials/footer") -%>
