@@ -1,14 +1,29 @@
 <%- include("partials/header") -%>
-    <div class="box">
+    <div class="mb-3">
         <%Lists.forEach(function(list){ %>
-            <form action="/Lists/<%= list.name %>" method="get" class="left-align-form">
-                <button class="rounded-button"><%= list.name %></button>
+            <form action="/Lists/<%= list.name %>" method="get" class="mx-auto col-10 col-md-8 col-lg-6">
+                <div>
+                    <button class="btn btn-primary" style="width: 150px; height: 50px; background-color: #A683E3;"><%= list.name %></button>
+                </div>
+                
             </form>
         <% }) %>
-        <form action="/addList" method="post" class="left-align-form">
-            <input type="text" autocomplete="off" name="NewList" placeholder="New List" required
-            oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
-            <button type="submit" name="btnNewList" class="round-button">+</button>
+        
+        <form action="/addList" method="post" class="mx-auto col-10 col-md-8 col-lg-6">
+            <div class="row">
+                <div class="col">
+                    <div class="form-floating">
+                        <input class="form-control" id="floatingInput" type="text" autocomplete="off" name="NewList" placeholder="New List" required
+                        oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
+                        <label for="floatingInput">New List</label>
+                    </div>
+                </div>
+                
+                <div class="col" style="align-self: center;">
+                    <button type="submit" name="btnNewList" class="btn btn-primary" style="background-color: #A683E3; border-radius: 25px; margin-right: 5px;">+</button>
+                </div>
+            </div>  
+
         </form>
     </div>
 <%- include("partials/footer") -%>

@@ -6,10 +6,19 @@ function myDelete(){
    let body = JSON.stringify({task: selected});
    fetch("/remove",
    {method: "post",
+   redirect: "follow",
    body: body,
    headers: {
        'Content-Type' : 'application/json' 
-   }});
+   }})
+   .then(response => {
+    if(response.redirected){
+        window.location.href = "/Lists/" + pageTitle;
+    }
+   })
+   .catch(function(err){
+    console.info(err);
+   });
 }
 
 function iDelete(obj){

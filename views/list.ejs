@@ -1,54 +1,83 @@
 <%- include("partials/header") -%>
-        <nav>
-            <input type="checkbox">
-            <span></span>
-            <span></span>
-            
-            <ul class="menu_list">
+    <p>
+        <button style="background-color: #A683E3;" class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample">
+            =
+        </button>
+    </p>
+    <div style="min-height: 120px;">
+        <div class="collapse collapse-horizontal" id="collapseWidthExample">
+            <div class="card card-body" style="width: 300px; cursor: pointer;">
+                <form id="home" method="get" action="/"></form>
+                <a class="dropdown-item" onclick="document.getElementById('home').submit()">Home</a>
                 <form id="renameList" method="get" action="/renameList"></form>
-                <li><a onclick="document.getElementById('renameList').submit()">Rename List</a></li>
+                <a class="dropdown-item" onclick="document.getElementById('renameList').submit()">Rename List</a>
                 <form id="deleteList" method="post" action="/DeleteList"></form>
-                <li><a onclick="document.getElementById('deleteList').submit();">Delete List</a></li>
-            </ul>
-        </nav>
-
-        <div class="box" id="heading">
-            <h1 id="ListTitle"><%= ListTitle %></h1>
+                <a onclick="document.getElementById('deleteList').submit();">Delete List</a>
+            </div>
         </div>
+        <h1 class="text-center" id="ListTitle"><%= ListTitle %></h1>
+    </div>
 
-        <div class="box">
-            <% let i = 0; %>
-            <%Tasks.forEach(function(Task){ %>
-                <div class="item">
-                    <input type="checkbox" value="<%= Task %>" name="check">
-                    <p id="TaskName"><%=  Task %></p>
-                        <button value="<%= Task %>" id="btnIDelete" onclick="iDelete(this)" class="btn btn-delete">
-                            <span class="mdi mdi-delete mdi-24px"></span>
-                            <span class="mdi mdi-delete-empty mdi-24px"></span>
-                            <span>Delete</span>
-                          </button>
+    <div class="container overflow-hidden text-center">
+        <% let i = 0; %>
+        <%Tasks.forEach(function(Task){ %>
+            <div class="row gy-5">
+                <div class="col">
+                    <div class="p-3">
+                        <input type="checkbox" value="<%= Task %>" name="check">
+                    </div>
                 </div>
-                <% i += 1; %>
-           <% }); %>
-           <form class="left-align-form">
-            <button id="btnDelete" class="delete-button" onclick="myDelete()">-</button>
-           </form>
-            
-           <form action="/Lists/<%= ListTitle %>" method="post" class="item">
-                <input autocomplete="off" type="text" name="NewTask" placeholder="New Task" required
-                oninvalid="this.setCustomValidity('task is required')" oninput="this.setCustomValidity('')">
-                <button type="submit" name="btnList" class="round-button">+</button>
-            </form>
-            <%Lists.forEach(function(list){ %>
-                <form action="/Lists/<%= list.name %>" method="get" class="left-align-form">
-                    <button class="rounded-button"><%= list.name %></button>
-                </form>
-            <% }) %>
-            <form action="/addList" method="post" class="left-align-form">
-                <input type="text" autocomplete="off" name="NewList" placeholder="New List" required
-                oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
-                <button type="submit" name="btnNewList" class="round-button">+</button>
-            </form>
+                <div class="col" id="TaskName">
+                    <div class="p-3">
+                        <%=  Task %>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3">
+                        <button  value="<%= Task %>" id="btnIDelete" onclick="iDelete(this)" class="btn btn-primary" style="background-color: #A683E3;">delete</button></div>
+                    </div>
+            </div>
+        <%}); %>
+    </div>
+
+
+    <div class="container text-center">
+        <div class="row gy-5">
+            <div class="col"><div class="p-3"><button id="btnDelete" class="btn btn-primary" style="background-color: #A683E3;" onclick="myDelete()">Delete checked</button></div></div>
+            <div class="col">
+                <div class="p-3">
+                    <form action="/Lists/<%= ListTitle %>" method="post">
+                        <div class="input-group mb-3">
+                            <div class="form-floating">
+                                <input class="form-control" id="floatingInput" type="text" autocomplete="off" name="NewTask" placeholder="New Task" required
+                                oninvalid="this.setCustomValidity('Task Name Is Required')" oninput="this.setCustomValidity('')">
+                                <label for="floatingInput">New Task</label>
+                            </div>
+                            <div class="input-group-append">
+                                <button type="submit" name="btnTask" class="btn btn-primary" style="background-color: #A683E3;">+</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col"><div class="p-3"></div></div>
         </div>
+    </div>
+    <div class="dropdown container text-center">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Lists
+        </button>
+        <ul class="dropdown-menu">
+            <%Lists.forEach(function(list){ %>
+                <li><a class="dropdown-item" href="<%= list.name %>"><%= list.name %></button>
+            <% }) %>
+        </ul>
+    </div>
+    
+    <form action="/addList" method="post" class="container text-center">
+        <input type="text" autocomplete="off" name="NewList" placeholder="New List" required
+        oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
+        <button type="submit" name="btnNewList" class="round-button">+</button>
+    </form>
         
 <%- include("partials/footer") -%>

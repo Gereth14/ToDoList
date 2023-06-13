@@ -4,6 +4,7 @@ const express = require("express");
 const path = require("path");
 const bodyparser = require("body-parser");
 const { MongoClient } = require("mongodb");
+const rootdir = require('./')
 const PORT = 3000;
 
 const app = express();
@@ -11,6 +12,8 @@ app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+//app.use(express.static(path.join(__dirname, "sass")));
+app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
 
 // Database and collection initialisation
 const uri = `mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/`;
@@ -19,10 +22,7 @@ const db = client.db("dbToDoList");
 const coll = db.collection("Lists");
 
 let page = "";
-
 let Lists = [];
-let allItems = [];
-let Collections = [];
 
 app.get("/", function(req, res){
     async function DisplayLists(){
@@ -115,7 +115,7 @@ app.post("/addList", function(req, res){
 
 app.get("/renameList", function(req, res){
     res.render("rename", {ListTitle: page});
-})
+});
 
 app.post("/renameList", function(req, res){
     // TODO: rename colection
@@ -138,7 +138,7 @@ app.post("/DeleteList", function(req, res){
         }
     }
     DeleteList();
-})
+});
 
 app.listen(process.env.PORT || PORT, function(){
     console.log(`SERVER: http://LocalHost:${PORT}`);
