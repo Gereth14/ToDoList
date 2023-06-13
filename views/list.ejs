@@ -53,7 +53,7 @@
                 </div>
                 <div class="col-6">
                     <div class="p-3">
-                        <button  value="<%= Task %>" id="btnIDelete" onclick="iDelete(this)" class="btn btn-primary" style="background-color: #A683E3;">delete</button></div>
+                        <button  value="<%= Task %>" id="btnIDelete" onclick="iDelete(this)" class="rounded-pill" style="background-color: #A683E3;">delete</button></div>
                     </div>
             </div>
         <%}); %>
@@ -62,7 +62,7 @@
 
     <div class="container text-center">
         <div class="row gy-5">
-            <div class="col"><div class="p-3"><button id="btnDelete" class="btn btn-primary" style="background-color: #A683E3;" onclick="myDelete()">Delete checked</button></div></div>
+            <div class="col"><div class="p-3"><button id="btnDelete" class="rounded-pill" style="background-color: #A683E3;" onclick="myDelete()">Delete checked</button></div></div>
             <div class="col">
                 <div class="p-3">
                     <form action="/Lists/<%= ListTitle %>" method="post">
@@ -73,7 +73,7 @@
                                 <label for="floatingInput">New Task</label>
                             </div>
                             <div class="input-group-append">
-                                <button type="submit" name="btnTask" class="btn btn-primary" style="background-color: #A683E3;">+</button>
+                                <button type="submit" name="btnTask" class="rounded-pill" style="background-color: #A683E3;">+</button>
                             </div>
                         </div>
                     </form>
@@ -96,7 +96,7 @@
     <form action="/addList" method="post" class="container text-center">
         <input type="text" autocomplete="off" name="NewList" placeholder="New List" required
         oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
-        <button type="submit" name="btnNewList" class="round-button">+</button>
+        <button type="submit" name="btnNewList" class="rounded-pill" style="background-color: #A683E3;">+</button>
     </form>
         
 <%- include("partials/footer") -%>
