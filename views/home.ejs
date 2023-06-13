@@ -2,25 +2,32 @@
     <div class="mb-3">
         <%Lists.forEach(function(list){ %>
             <form action="/Lists/<%= list.name %>" method="get" class="mx-auto col-10 col-md-8 col-lg-6">
-                <div>
-                    <button class="btn btn-primary" style="width: 150px; height: 50px; background-color: #A683E3;"><%= list.name %></button>
+                <div class="container text-center">
+                    <div class="col">
+                        <div class="p-3">
+                            <button class="btn btn-primary" style="width: 150px; height: 50px; background-color: #A683E3;"><%= list.name %></button>
+                        </div>
+                    </div>
+                    
                 </div>
                 
             </form>
         <% }) %>
         
         <form action="/addList" method="post" class="mx-auto col-10 col-md-8 col-lg-6">
-            <div class="row">
+            <div class="container text-center">
                 <div class="col">
-                    <div class="form-floating">
-                        <input class="form-control" id="floatingInput" type="text" autocomplete="off" name="NewList" placeholder="New List" required
-                        oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
-                        <label for="floatingInput">New List</label>
+                    <div class="input-group mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" id="floatingInput" type="text" autocomplete="off" name="NewList" placeholder="New List" required
+                            oninvalid="this.setCustomValidity('List Name is required')" oninput="this.setCustomValidity('')">
+                            <label for="floatingInput">New List</label>
+                        </div>
+                        <div class="input-group-append">
+                            <button type="submit" name="btnNewList" class="btn btn-primary" style="background-color: #A683E3;">+</button>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="col" style="align-self: center;">
-                    <button type="submit" name="btnNewList" class="btn btn-primary" style="background-color: #A683E3; border-radius: 25px; margin-right: 5px;">+</button>
+                    
                 </div>
             </div>  
 
