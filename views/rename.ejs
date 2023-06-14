@@ -1,14 +1,21 @@
 <%- include("partials/header") -%>
+    <p>
+        <form action="Lists/<%= ListTitle %>" method="get">
+            <button type="submit" class="btn btn-primary" style="background-color: #A683E3;"><</button>
+        </form>
+    </p>
     <div class="container text-center" id="heading">
         <h1><%= ListTitle %></h1>
     </div>
-        <form method="post" action="/renameList" class="center-align-form">
-            <div class="container text-center">
-                <input class="rename-input" autocomplete="off" name="Name" placeholder="New List Name" required oninvalid="this.setCustomValidity('List Name Required')" oninput="this.setCustomValidity('')">
+    <form method="post" action="/renameList" class="center-align-form">
+        <div class="container text-center">
+            <div class="form-floating">
+                <input type="text" class="form-control col-xs-3" style="--bs-gutter-y: 0; display: flex; flex-wrap: wrap; margin-top: calc(var(--bs-gutter-y) * -1); margin-right: calc(var(--bs-gutter-x) * -.5); margin-left: calc(var(--bs-gutter-x) * -.5);" id="ChangeName" autocomplete="off" name="Name" placeholder="New List Name"
+                    required oninvalid="this.setCustomValidity('New List Name Required')" oninput="this.setCustomValidity('')">
+                <label for="ChangeName">New List Name</label>
                 <button type="submit" class="btn btn-primary" style="background-color: #A683E3;">Change Name</button>
             </div>
-            
-        </form>
-    </div>   
+        </div>
+    </form>
 
 <%- include("partials/footer") -%>
