@@ -90,6 +90,14 @@ app.post("/login", function(req, res){
     });
 });
 
+app.get("/logout", function(req, res){
+    page = "";
+    Lists;
+    UserEmail = "";
+    Tasks;
+    res.render("about")
+})
+
 app.get("/home", function(req, res){
     async function DisplayLists(){
         try{
