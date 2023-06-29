@@ -42,7 +42,7 @@ userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["Password"], decr
 var User = mongoose.model('Account', userSchema, 'Account');
 
 app.get("/", function(req, res){
-    res.render("About");
+    res.render("about");
 })
 
 app.get("/SignUp", function(req, res){
