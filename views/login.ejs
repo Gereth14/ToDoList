@@ -1,0 +1,19 @@
+<%- include("partials/header") -%>
+    <div class="position-absolute top-50 start-50 translate-middle">
+        <p class="text-center fs-2">Login</p>
+        <form action="/login" method="post">
+            <div class="form-floating mb-3">
+                <input type="email" name="Email" class="form-control" id="floatingInput" placeholder="name@example.com" autocomplete="off">
+                <label for="floatingInput">Email address</label>
+              </div>
+              <div class="form-floating">
+                <input type="password" name="Password" class="form-control" id="floatingPassword" placeholder="Password">
+                <label for="floatingPassword">Password</label>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary" style="background-color: #A683E3;">Login</button>
+              </div>
+        </form>
+        <p>Don't have an account? Sign Up <a href="SignUp">here</a>!</p>
+    </div>
+<%- include("partials/footer") -%>

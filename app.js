@@ -4,7 +4,9 @@ const express = require("express");
 const path = require("path");
 const bodyparser = require("body-parser");
 const { MongoClient } = require("mongodb");
-const rootdir = require('./')
+var mongoose = require("mongoose");
+var encrypt = require("mongoose-encryption");
+const { ClientEncryption } = require("mongodb-client-encryption");
 const PORT = 3000;
 
 const app = express();
@@ -19,21 +21,87 @@ app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
 const uri = `mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/`;
 const client = new MongoClient(uri);
 const db = client.db("dbToDoList");
-const coll = db.collection("Lists");
+const coll = db.collection("Account");
 
 let page = "";
-let Lists = [];
+let Lists;
+let UserEmail = "";
+let Tasks;
+
+
+// Mongoose encryption
+mongoose.connect(`mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/dbToDoList`);
+var userSchema = new mongoose.Schema({
+    Email: String,
+    Password: String,
+    Lists: Array,
+});
+
+var secret = process.env.secret;
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["Password"], decryptPostSave: false } );
+var User = mongoose.model('Account', userSchema, 'Account');
 
 app.get("/", function(req, res){
+    res.render("About");
+})
+
+app.get("/SignUp", function(req, res){
+    res.render("SignUp");
+});
+
+app.post("/SignUp", function(req, res){
+    async function SignUp(){
+        try{
+            var newUser = new User({
+                Email: req.body.Email,
+                Password: req.body.Password,
+                Lists: Lists,
+            });
+            await newUser.save();
+        }finally{
+            res.redirect("/login");
+        }
+    }
+    SignUp();
+});
+
+app.get("/login", function(req, res){
+    res.render("login");
+});
+
+app.post("/login", function(req, res){
+    User.find({Email: req.body.Email}, function(err, docs){
+        if(err){
+            console.log(err);
+        }else{
+            try{
+                docs.forEach(function(doc){
+                    if(doc.Email == req.body.Email && doc.Password == req.body.Password){
+                        UserEmail = doc.Email;
+                        res.redirect("/home");
+                    }
+                });
+            }catch(err){
+                console.log(err);
+            }
+            
+           
+        }
+    });
+});
+
+app.get("/home", function(req, res){
     async function DisplayLists(){
         try{
             await client.connect();
-            const cursor = coll.find();
-            Lists = [];
-            await cursor.forEach(function(list){
-                Lists.push(list);
+            const cursor = coll.find({Email: UserEmail });
+            let i = [];
+            await cursor.forEach(function(q){
+                i.push(q);
             });
-            
+            i.forEach(function(list){
+                Lists = list.Lists
+            });
         }finally{
             res.render("home", {Lists : Lists});
         }
@@ -44,33 +112,30 @@ app.get("/", function(req, res){
 app.get("/Lists/:list", function(req,res){
     async function LoadList(){
         try{
-            let query = {name : req.params.list};
-            const cursor = await coll.find(query).toArray();
-            Tasks = [];
-            await cursor.forEach(function(task){
-                for(let i = 0; i < task.Tasks.length; i++){
-                    Tasks.push(task.Tasks[i]);
+            page = req.params.list;
+            Lists.forEach(function(list){
+                if(list.name == req.params.list){
+                    Tasks = list.tasks;
                 }
             });
-            
         }finally{
             res.render("list", {ListTitle: req.params.list, Tasks : Tasks, Lists : Lists});
         }
     }
-    page = req.params.list;
     LoadList();
 });
 
 
 app.post("/Lists/:list", function(req, res){
-    async function InsertItem(list){
+    async function InsertItem(){
         try{
-            await coll.updateOne({name: page}, {$push: {Tasks: req.body.NewTask}})
+            Tasks.push(req.body.NewTask);
+            await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.tasks": Tasks}});
         }finally{
             res.redirect("/Lists/" + page);
         }
     }
-    InsertItem(req.params.list);
+    InsertItem();
 });
 
 app.post("/remove", function(req, res){
@@ -78,11 +143,16 @@ app.post("/remove", function(req, res){
     req.body.task.forEach(function(tasks){
         task.push(tasks);
     });
+    for(let i = 0; i < Tasks.length; i++){
+        for(let q = 0; q < task.length; q++){
+            if(task[q] === Tasks[i]){
+                Tasks.splice(i, 1);
+            }
+        }
+    }
     async function DeleteTask(){
         try{
-            for(let i = 0; i < task.length; i++){
-                await coll.updateOne({name: page}, {$pull: {Tasks: task[i]}});
-            }
+            await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.tasks": Tasks}});
         }finally{
             res.redirect("/Lists/" + page);
         }
@@ -91,9 +161,14 @@ app.post("/remove", function(req, res){
 });
 
 app.post("/DeleteItem", function(req, res){
+    for(let i = 0; i < Tasks.length; i++){
+        if(Tasks[i] === req.body.task){
+            Tasks.splice(i, 1);
+        }
+    }
     async function DeleteItem(){
         try{
-            await coll.updateOne({name: page}, {$pull: {Tasks: req.body.task}});
+            await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.tasks": Tasks}});
         }finally{
             res.redirect("Lists/" + page);
         }
@@ -105,9 +180,9 @@ app.post("/addList", function(req, res){
     async function AddList(){
         try{
             let list = [];
-            await coll.insertOne({name: req.body.NewList, Tasks: list});
+            await coll.updateOne({Email: UserEmail}, {$push: {Lists:{name: req.body.NewList, tasks: list}}});
         }finally{
-            res.redirect("/");
+            res.redirect("/home");
         }
     }
     AddList();
@@ -118,12 +193,11 @@ app.get("/renameList", function(req, res){
 });
 
 app.post("/renameList", function(req, res){
-    // TODO: rename colection
     async function renameList(){
         try{
-            await coll.updateOne({name: page}, {$set: {name: req.body.Name}});
+            await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.name": req.body.Name}});
         }finally{
-            res.redirect("/");
+            res.redirect("/home");
         }
     }
     renameList();
@@ -132,9 +206,9 @@ app.post("/renameList", function(req, res){
 app.post("/DeleteList", function(req, res){
     async function DeleteList(){
         try{
-            await coll.deleteOne({name: page});
+            await coll.updateOne({Email: UserEmail}, {$pull: {Lists: {name: page}}}, false, true,);
         }finally{
-            res.redirect("/");
+            res.redirect("/home");
         }
     }
     DeleteList();
