@@ -4,9 +4,9 @@ const express = require("express");
 const path = require("path");
 const bodyparser = require("body-parser");
 const { MongoClient } = require("mongodb");
+const scripts = require("./public/script/scripts")
 var mongoose = require("mongoose");
 var encrypt = require("mongoose-encryption");
-const { ClientEncryption } = require("mongodb-client-encryption");
 const PORT = 3000;
 
 const app = express();
@@ -14,7 +14,6 @@ app.set('view engine', 'ejs');
 app.use(bodyparser.urlencoded({extended: true}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-//app.use(express.static(path.join(__dirname, "sass")));
 app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
 
 // Database and collection initialisation
@@ -74,18 +73,12 @@ app.post("/login", function(req, res){
         if(err){
             console.log(err);
         }else{
-            try{
-                docs.forEach(function(doc){
-                    if(doc.Email == req.body.Email && doc.Password == req.body.Password){
-                        UserEmail = doc.Email;
-                        res.redirect("/home");
-                    }
-                });
-            }catch(err){
-                console.log(err);
+            UserEmail = scripts.ValidateUser(docs, req.body.Email, req.body.Password, UserEmail);
+            if(UserEmail != ""){
+                res.redirect("/home");
+            }else{
+                res.redirect("/login");
             }
-            
-           
         }
     });
 });
@@ -96,7 +89,7 @@ app.get("/logout", function(req, res){
     UserEmail = "";
     Tasks;
     res.render("about")
-})
+});
 
 app.get("/home", function(req, res){
     async function DisplayLists(){
@@ -120,12 +113,8 @@ app.get("/home", function(req, res){
 app.get("/Lists/:list", function(req,res){
     async function LoadList(){
         try{
-            page = req.params.list;
-            Lists.forEach(function(list){
-                if(list.name == req.params.list){
-                    Tasks = list.tasks;
-                }
-            });
+           page = req.params.list; // specifcy which page the list page is in
+           Tasks = scripts.AddTaskIntoList(Lists, Tasks, req.params.list);
         }finally{
             res.render("list", {ListTitle: req.params.list, Tasks : Tasks, Lists : Lists});
         }
@@ -147,17 +136,7 @@ app.post("/Lists/:list", function(req, res){
 });
 
 app.post("/remove", function(req, res){
-    let task = [];
-    req.body.task.forEach(function(tasks){
-        task.push(tasks);
-    });
-    for(let i = 0; i < Tasks.length; i++){
-        for(let q = 0; q < task.length; q++){
-            if(task[q] === Tasks[i]){
-                Tasks.splice(i, 1);
-            }
-        }
-    }
+    Tasks = scripts.removeItem(req.body.task, Tasks);
     async function DeleteTask(){
         try{
             await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.tasks": Tasks}});
@@ -169,11 +148,7 @@ app.post("/remove", function(req, res){
 });
 
 app.post("/DeleteItem", function(req, res){
-    for(let i = 0; i < Tasks.length; i++){
-        if(Tasks[i] === req.body.task){
-            Tasks.splice(i, 1);
-        }
-    }
+    Tasks = scripts.deleteItem(req.body.task, Tasks);
     async function DeleteItem(){
         try{
             await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.tasks": Tasks}});
