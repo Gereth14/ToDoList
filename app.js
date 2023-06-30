@@ -1,4 +1,3 @@
-//jshint esversion:6
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
@@ -26,7 +25,6 @@ let page = "";
 let Lists;
 let UserEmail = "";
 let Tasks;
-
 
 // Mongoose encryption
 mongoose.connect(`mongodb+srv://${process.env.user}:${process.env.password}@mycluster.kquwbl3.mongodb.net/dbToDoList`);
@@ -75,6 +73,8 @@ app.post("/login", function(req, res){
         }else{
             UserEmail = scripts.ValidateUser(docs, req.body.Email, req.body.Password, UserEmail);
             if(UserEmail != ""){
+                req.body.Email = "";
+                req.body.password = "";
                 res.redirect("/home");
             }else{
                 res.redirect("/login");
