@@ -77,3 +77,15 @@ exports.AddTaskIntoList = function(Lists, Tasks, page){
     });
     return Tasks;
 }
+
+exports.CheckListExist = function(Lists, NewList){
+    let ListExists = "";
+    Lists.forEach(function(List){
+        if(List.name == NewList){
+            ListExists = "True";
+        }else{
+            ListExists = "False";
+        }
+    });
+    return ListExists;
+}

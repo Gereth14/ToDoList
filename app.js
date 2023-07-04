@@ -10,7 +10,6 @@ const scripts = require("./public/script/scripts")
 var mongoose = require("mongoose");
 var encrypt = require("mongoose-encryption");
 const nodemailer= require("nodemailer");
-const { create } = require("domain");
 const PORT = 3000;
 
 const app = express();
@@ -240,7 +239,7 @@ app.get("/home", function(req, res){
                 Lists = list.Lists
             });
         }finally{
-            res.render("home", {Lists : Lists});
+            res.render("home", {Lists : Lists, Message: ""});
         }
     }
     DisplayLists();
@@ -296,15 +295,32 @@ app.post("/DeleteItem", function(req, res){
 });
 
 app.post("/addList", function(req, res){
+    
     async function AddList(){
         try{
-            let list = [];
-            await coll.updateOne({Email: UserEmail}, {$push: {Lists:{name: req.body.NewList, tasks: list}}});
-        }finally{
+            let ListExists = scripts.CheckListExist(Lists, req.body.NewList);
+            if(ListExists == "False"){
+                let list = [];
+                await coll.updateOne({Email: UserEmail}, {$push: {Lists:{name: req.body.NewList, tasks: list}}});
+                const cursor = coll.find({Email: UserEmail });
+                let i = [];
+                await cursor.forEach(function(q){
+                    i.push(q);
+                });
+                i.forEach(function(list){
+                    Lists = list.Lists
+                });
+                res.render("home", {Lists : Lists, Message: ""});
+            }else{
+                res.render("home", {Lists : Lists, Message: "List already exist!"});
+            }
+            
+        }catch(err){
+            console.log(err);
             res.redirect("/home");
         }
     }
-    AddList();
+   AddList();
 });
 
 app.get("/renameList", function(req, res){
