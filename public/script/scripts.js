@@ -22,14 +22,51 @@ exports.deleteItem = function(task, Tasks){
     return Tasks;
 }
 
-exports.ValidateUser = function(docs, Email, Password, UserEmail){
-   docs.forEach(function(doc){
-    if(doc.Email == Email && doc.Password == Password){
-        UserEmail = Email;
-        
-    }
+exports.ConfirmAccountCreation = function(docs, email){
+    let Continue = "True";
+    docs.forEach(function(doc){
+        if(doc.Email == email){
+            Continue = "False";
+        }else{
+            Continue = "True";
+        }
+    });
+    return Continue;
+}
+
+exports.ValidateUser = function(docs, Email, Password){
+    let UserEmail = "";
+    docs.forEach(function(doc){
+        if(doc.Email.toLowerCase() === Email.toLowerCase() && doc.Password === Password){
+            UserEmail = Email;
+        }
    });
    return UserEmail;
+}
+
+exports.ConfirmedEmail = function(docs){
+    let confirmedEmail = "false"
+    docs.forEach(function(doc){
+        if(doc.Status != 'Active'){
+            confirmedEmail = "false";
+        }else{
+            confirmedEmail = "true";
+        }
+    });
+    return confirmedEmail;
+}
+
+exports.sendConfirmationEmail = function(name, email, confirmationCode, transport, user, subject, message, link){
+    transport.sendMail({
+        from: user,
+        to: email,
+        subject: `${subject}`,
+        html: `<h1>${subject}</h1>
+        <h2>Hello ${name}</h2>
+        <p>${message}</p>
+        <a href=https://jeruftodolist.onrender.com/${link}/${confirmationCode}> Click here</a>
+        </div>`,
+    });
 }
 
 exports.AddTaskIntoList = function(Lists, Tasks, page){

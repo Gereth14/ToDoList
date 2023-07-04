@@ -35,8 +35,20 @@ function iDelete(obj){
         if(response.redirected){
             window.location.href = "/Lists/" + pageTitle;
         }
-       })
-       .catch(function(err){
+    })
+    .catch(function(err){
         console.info(err);
-       });
+    });
+}
+
+var check= function(){
+    if(document.getElementById('floatingPassword').value == document.getElementById('floatingConfirmPassword').value){
+        document.getElementById('Message').style.color = 'green';
+        document.getElementById('Message').innerHTML = 'matching';
+        document.getElementById('SignUp').disabled = false;
+    }else{
+        document.getElementById('Message').style.color = 'red';
+        document.getElementById('Message').innerHTML = 'not matching';
+        document.getElementById('SignUp').disabled = true;
+    }
 }
