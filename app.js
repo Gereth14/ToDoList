@@ -295,7 +295,6 @@ app.post("/DeleteItem", function(req, res){
 });
 
 app.post("/addList", function(req, res){
-    
     async function AddList(){
         try{
             let ListExists = scripts.CheckListExist(Lists, req.body.NewList);
@@ -330,8 +329,17 @@ app.get("/renameList", function(req, res){
 app.post("/renameList", function(req, res){
     async function renameList(){
         try{
-            await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.name": req.body.Name}});
-        }finally{
+            let ListExists = scripts.CheckListExist(Lists, req.body.Name);
+            console.log(ListExists +"rename");
+            if(ListExists == "False"){
+                await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.name": req.body.Name}});
+                res.render("home", {Lists : Lists, Message: ""});
+            }else{
+                res.render("home", {Lists : Lists, Message: "List already exist!"});
+            } 
+            
+        }catch(err){
+            console.log(err);
             res.redirect("/home");
         }
     }

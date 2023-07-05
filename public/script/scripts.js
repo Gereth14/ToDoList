@@ -79,13 +79,18 @@ exports.AddTaskIntoList = function(Lists, Tasks, page){
 }
 
 exports.CheckListExist = function(Lists, NewList){
-    let ListExists = "";
-    Lists.forEach(function(List){
-        if(List.name == NewList){
+    let ListExists = "False";
+    for(let i = 0; i < Lists.length; i++){
+        if(Lists[i].name == NewList){
             ListExists = "True";
+            i += Lists.length;
         }else{
             ListExists = "False";
         }
-    });
+    }
     return ListExists;
+}
+
+exports.AddListFromDB = function(){
+    // place code from app.js in here
 }
