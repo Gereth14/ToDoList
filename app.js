@@ -330,7 +330,6 @@ app.post("/renameList", function(req, res){
     async function renameList(){
         try{
             let ListExists = scripts.CheckListExist(Lists, req.body.Name);
-            console.log(ListExists +"rename");
             if(ListExists == "False"){
                 await coll.updateOne({Email: UserEmail, "Lists.name": page}, {$set: {"Lists.$.name": req.body.Name}});
                 res.render("home", {Lists : Lists, Message: ""});
