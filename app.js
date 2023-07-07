@@ -78,12 +78,7 @@ app.get("/SignUp", function(req, res){
 app.post("/SignUp", function(req, res){
     async function SignUp(){
         try{
-            req.body.ErrorLabel = "testing";
-            const characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            let token = "";
-            for(let i = 0; i < 25; i++){
-                token += characters[Math.floor(Math.random() * characters.length)];
-            }
+            let ConfirmationCode = scripts.ConfirmationCode();
             let ContinueCreation = "";
             User.find({Email: req.body.Email}, function(err, docs){
                 ContinueCreation = scripts.ConfirmAccountCreation(docs, req.body.Email);
@@ -94,12 +89,12 @@ app.post("/SignUp", function(req, res){
                         Password: req.body.Password,
                         Lists: Lists,
                         Status: "Pending",
-                        ConfirmationCode: token,
+                        ConfirmationCode: ConfirmationCode,
                     });
                     const subject = "Confirmation Eamil";
                     const message = "Thank you for signing up. Please click on the link to confirm your email!";
                     const link = "confirm";
-                    scripts.sendConfirmationEmail(req.body.Name, req.body.Email, token, transport, process.env.email, subject, message, link);
+                    scripts.sendConfirmationEmail(req.body.Name, req.body.Email, ConfirmationCode, transport, process.env.email, subject, message, link);
                     newUser.save();
                     res.render("ConfirmEmail", {Message: "Please confirm your email address in your inbox!"});
                 }else{
@@ -130,8 +125,7 @@ app.post("/login", function(req, res){
                     req.body.password = "";
                     res.redirect("/home");
                 }else{
-                    res.render("login", {ErrorMessage: "Please confirm your email address in your inbox!"})
-                    console.log("Email not confirmed");
+                    res.render("login", {ErrorMessage: "Please confirm your email address in your inbox!"});
                 }
                 
             }else{
@@ -188,11 +182,7 @@ app.get("/ChangePassword/:ConfirmationCode", function(req, res){
 
 app.post("/ChangePassword", function(req, res){
     async function ChangePassword(){
-        const characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        let newConfirmationCode = "";
-        for(let i = 0; i < 25; i++){
-            newConfirmationCode += characters[Math.floor(Math.random() * characters.length)];
-        }
+       let newConfirmationCode = scripts.ConfirmationCode();
         User.find({Email: Email}, function(err, docs){
             let AccountnonExistant = scripts.ConfirmAccountCreation(docs, Email);
             if(AccountnonExistant == "False"){
@@ -230,6 +220,7 @@ app.get("/home", function(req, res){
     async function DisplayLists(){
         try{
             await client.connect();
+            
             const cursor = coll.find({Email: UserEmail });
             let i = [];
             await cursor.forEach(function(q){

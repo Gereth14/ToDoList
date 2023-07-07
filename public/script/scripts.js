@@ -91,6 +91,11 @@ exports.CheckListExist = function(Lists, NewList){
     return ListExists;
 }
 
-exports.AddListFromDB = function(){
-    // place code from app.js in here
+exports.ConfirmationCode = function(){
+    const characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let newConfirmationCode = "";
+    for(let i = 0; i < 25; i++){
+        newConfirmationCode += characters[Math.floor(Math.random() * characters.length)];
+    }
+    return newConfirmationCode;
 }
